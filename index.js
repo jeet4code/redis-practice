@@ -2,6 +2,8 @@ const redis = require("redis");
 const express = require("express");
 const { promisify } = require("util");
 const request = promisify(require("request"));
+require('./db-connection');
+const userRoute = require("./routes/user");
 
 const app = express();
 
@@ -33,7 +35,9 @@ app.get('/flushdb', (req, res) => {
         if(err) res.send(err);
         res.send("Cleared all Data");
     });
-})
+});
+
+app.use("/user", userRoute);
 
 app.listen(3000, () => {
     console.log("application running at: http://localhot:3000");
