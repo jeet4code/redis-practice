@@ -4,6 +4,8 @@ const userRoute = require("./routes/user");
 const redisClient = require("./redis-connection");
 const app = express();
 
+app.set('view engine', 'ejs');
+
 app.get('/', async(req, res, next) => {
     res.redirect('/user');
 });
