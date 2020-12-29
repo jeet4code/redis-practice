@@ -8,11 +8,7 @@ module.exports.initDB = async(req, res) => {
     try {
         const response = await request("https://jsonplaceholder.typicode.com/users");
         const users = JSON.parse(response.body);
-        const savedUsers = users.map(user => {
-            const userModel = new UserModel(user);
-            return userModel.save();
-        });
-        await Promise.all(savedUsers);
+        await UserModel.collection.insertMany(users);
         res.redirect('/user');
     } catch (error) {
         console.log(error);
