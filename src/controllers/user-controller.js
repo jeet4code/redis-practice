@@ -1,6 +1,6 @@
 const { promisify } = require('util');
 const { body,validationResult } = require('express-validator');
-const UserModel = require('../models/user');
+const User = require('../models/user');
 const request = promisify(require("request"));
 const redisClient = require('../redis-connection');
 
@@ -8,7 +8,7 @@ module.exports.initDB = async(req, res) => {
     try {
         const response = await request("https://jsonplaceholder.typicode.com/users");
         const users = JSON.parse(response.body);
-        await UserModel.collection.insertMany(users);
+        await User.collection.insertMany(users);
         res.redirect('/user');
     } catch (error) {
         console.log(error);
@@ -24,7 +24,7 @@ module.exports.showUserPage = async (req, res) => {
         return;
     }
     // If no data in cache then fetch from MongoDB.
-    const savedData = await UserModel.find();
+    const savedData = await User.find();
     if(savedData && savedData.length) {
         redisClient.set('allUsers', JSON.stringify(savedData), "EX", 10); // users.body are string so no need to stringify
         res.render("user-list", {users: savedData});
@@ -57,12 +57,34 @@ exports.register = [
             return true;
         }
         throw new Error('Password not matched');
-    }),(req, res) => {
+    }), async (req, res) => {
     
     const errors = validationResult(req);
+    const {username} = req.body;
     if(!errors.isEmpty()) {
         res.send(errors);
     } else {
-        res.send(req.body);
+        try {
+            const doesExist = await User.findOne({ username });
+            if (doesExist) {
+                res.redirect('/register');
+                return;
+            }
+            const user = new User(req.body);
+            await user.save();
+            res.redirect('/login');
+        } catch (error) {
+            console.log("Error", error);
+        }
+        
     }
 }];
+
+exports.private = (req, res) => {
+    res.render('private-page', {user: req.user});
+}
+
+exports.logout = async (req, res, next) => {
+    req.logout();
+    res.redirect('/');
+};

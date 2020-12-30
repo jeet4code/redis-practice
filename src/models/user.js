@@ -1,28 +1,29 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 const userSchema = mongoose.Schema({
     id: Number,
-    name: String,
     username: String,
     email: String,
-    address: {
-        street:String,
-        suite:String,
-        city:String,
-        zipcode:String,
-        geo:{
-            lat:Number,
-            lng:Number
+    password: String,
+});
+
+userSchema.pre("save", async function(next) {
+    try {
+        if(this.isNew) {
+            const salt = await bcrypt.genSalt(10);
+            this.password = await bcrypt.hash(this.password, salt);
         }
-    },
-    phone: String,
-    website: String,
-    company: {
-        name: String,
-        catchPhrase: String,
-        bs: String
+        next();
+    } catch(error) {
+        next(error);
     }
 });
+
+userSchema.methods.verifyPassword = async function (password) {
+    // don't use arrow function while using current instance(this).
+    return await bcrypt.compare(password, this.password);
+};
 
 const UserModel = mongoose.model("user", userSchema);
 
