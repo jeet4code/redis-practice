@@ -1,10 +1,11 @@
 {
-  "name": "redis-practice",
+  "name": "node-practice",
   "version": "1.0.0",
-  "description": "project to explore redis feature",
+  "description": "project to explore node js",
   "main": "src/index.js",
   "scripts": {
-    "start": "nodemon"
+    "start": "nodemon",
+    "test": "nodemon --exec 'npx mocha -R min'"
   },
   "author": "",
   "license": "ISC",
@@ -28,6 +29,7 @@
   },
   "devDependencies": {
     "autocannon": "^7.0.1",
+    "mocha": "^8.2.1",
     "nodemon": "^2.0.6"
   }
 }
