@@ -2,7 +2,14 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
 const userSchema = mongoose.Schema({
-    username: String,
+    username: {
+        type: String,
+        required: [true, "Username is required"],
+        validate: {
+            validator: (name) => name.length > 2,
+            message: "Username too short"
+        }
+    },
     email: String,
     password: String,
 });
