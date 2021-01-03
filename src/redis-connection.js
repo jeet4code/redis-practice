@@ -7,7 +7,7 @@ redisClient.on("error", function(error) {
     console.error(error);
 });
 
-redisClient.get = promisify(redisClient.get);
+// redisClient.get = promisify(redisClient.get);
 // redisClient.hget = promisify(redisClient.hget);
 
 module.exports = redisClient;

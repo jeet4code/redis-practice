@@ -18,7 +18,10 @@ module.exports.initDB = async(req, res) => {
 
 module.exports.showUserPage = async (req, res) => {
     // Check for cached data.
-    const cachedData = await redisClient.get('allUsers');
+    let cachedData;
+    redisClient.get('allUsers', (data) => {
+        cachedData = data;
+    });
     if(cachedData) {
         res.render("user-list", {users: JSON.parse(cachedData)});
         return;

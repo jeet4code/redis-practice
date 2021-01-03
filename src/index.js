@@ -8,25 +8,24 @@ const compression = require('compression');
 const helmet = require('helmet');
 const cors = require("cors");
 const session = require('express-session');
-const cookieParser = require('cookie-parser');
 const redisStore = require('connect-redis')(session);
 
+const logger = require('./utils/logger');
+
 const app = express();
-app.use(cookieParser("secret"));
+app.set("trust proxy", 1); // if we have to run this behind proxy.
 app.use(session({
     secret: "Shh, its a super secret! LOL", 
     saveUninitialized: false,
     resave: false,
     cookie: {
-        // secure: true,
+        secure: false,
         httpOnly: true,
+        maxAge: 1000*60*30
     },
-    // store: new redisStore({
-    //     host: '127.0.0.1',
-    //     port: 6379,
-    //     client: redisClient,
-    //     ttl: 260
-    // }),
+    store: new redisStore({
+        client: redisClient
+    }),
 }));
 app.set('view engine', 'ejs');
 app.set("views", path.join(__dirname,'views'));
@@ -39,9 +38,10 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'assets')));
 require('./utils/passport')(app);
 
-// app.get('/', async(req, res, next) => {
-//     res.redirect('/user');
-// });
+app.use((req, res, next) => {
+    logger.info(req.session);
+    next();
+});
 
 app.use("/", userRoute);
 
@@ -53,5 +53,5 @@ app.get('/flushcache', (req, res) => {
 });
 
 app.listen(3000, () => {
-    console.log("application running at: http://localhot:3000");
+    logger.info("application running at: http://localhost:3000");
 });
