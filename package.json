@@ -26,7 +26,8 @@
     "redis": "^3.0.2",
     "request": "^2.88.2",
     "winston": "^3.3.3",
-    "winston-daily-rotate-file": "^4.5.0"
+    "winston-daily-rotate-file": "^4.5.0",
+    "winston-mongodb": "^5.0.5"
   },
   "devDependencies": {
     "autocannon": "^7.0.1",
